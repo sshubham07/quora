@@ -1,4 +1,4 @@
-# 🧠 Quora Clone — Django Q&A App
+# Quora Clone — Django Q&A App
 
 A simple, functional **Quora-like Question & Answer web app**, built using Django.
 
@@ -19,83 +19,86 @@ Users can:
 - ✅ Like answers (with "Like"/"Liked" toggle)
 - ✅ Recent questions list
 - ✅ Clean UI using Bootstrap
-- ✅ CSRF protection & `@login_required` decorators
+- ✅ CSRF protection & \`@login_required\` decorators
+
+
+## 🧪 Running Locally
+
+1. **Clone the repo**
+
+    git clone https://github.com/your-username/quora-clone.git  
+    cd quora
+
+3. **Create virtual environment**
+
+    python -m venv env  
+    source env/bin/activate  
+
+4. **Install dependencies**
+
+    pip install -r requirements.txt
+
+5. **Apply migrations**
+
+    python manage.py migrate
+
+6. **Create superuser (optional)**
+
+    python manage.py createsuperuser
+
+7. **Run the server**
+
+    python manage.py runserver
+
+8. **Visit in browser**
+
+    http://127.0.0.1:8000/
 
 ---
 
-## 📸 Screenshots
+## 🧩 Models
 
-_Add your screenshots here if needed_
+### Question
+
+    class Question(models.Model):
+        title = models.CharField(max_length=200)
+        description = models.TextField()
+        author = models.ForeignKey(User, on_delete=models.CASCADE)
+        created_at = models.DateTimeField(auto_now_add=True)
+
+### Answer
+
+    class Answer(models.Model):
+        question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
+        content = models.TextField()
+        author = models.ForeignKey(User, on_delete=models.CASCADE)
+        created_at = models.DateTimeField(auto_now_add=True)
+
+### Like
+
+    class Like(models.Model):
+        answer = models.ForeignKey(Answer, on_delete=models.CASCADE, related_name='likes')
+        user = models.ForeignKey(User, on_delete=models.CASCADE)
+        created_at = models.DateTimeField(auto_now_add=True)
+
+        class Meta:
+            unique_together = ('answer', 'user')
 
 ---
 
-## 🛠️ Tech Stack
+## 🔐 Authentication
 
-- Python 3.8+
-- Django 4.x
-- SQLite (default)
-- HTML + CSS + Bootstrap 5
-- Django Templates
+- **Login:** /login/
+- **Logout:** /logout/ (redirects to homepage)
+- Pages like "Ask a Question" and "Answer" are protected with \`@login_required\`
 
 ---
 
-## 📁 Project Structure
+## 📝 Future Improvements
 
-quora_clone/ │ ├── project_name/ │ ├── settings.py │ ├── urls.py │ ├── app_name/ │ ├── models.py │ ├── views.py │ ├── urls.py │ ├── templates/ │ │ ├── home.html │ │ ├── question_detail.html │ │ ├── navbar.html │ ├── templates/ │ ├── base.html │ ├── login.html │ ├── static/ │ ├── db.sqlite3 ├── manage.py ├── requirements.txt └── README.md
-
-🧪 Running Locally
-Clone the repo
-
-bash
-Copy
-Edit
-git clone https://github.com/your-username/quora-clone.git
-cd quora-clone
-Create virtual environment
-
-bash
-Copy
-Edit
-python -m venv env
-source env/bin/activate  # Windows: env\Scripts\activate
-Install dependencies
-
-bash
-Copy
-Edit
-pip install -r requirements.txt
-Apply migrations
-
-bash
-Copy
-Edit
-python manage.py migrate
-Create superuser (optional)
-
-bash
-Copy
-Edit
-python manage.py createsuperuser
-Run the server
-
-bash
-Copy
-Edit
-python manage.py runserver
-Visit in browser
-
-cpp
-Copy
-Edit
-http://127.0.0.1:8000/
-📝 Future Improvements
-Add comments to answers
-
-Upvote/downvote system
-
-REST API (Django REST Framework)
-
-User profile pages
-
-Rich text editor
+- Add comments to answers
+- Upvote/downvote system
+- REST API (Django REST Framework)
+- User profile pages
+- Rich text editor
 
