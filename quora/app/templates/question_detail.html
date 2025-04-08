@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ question.title }}</h2>
+    <p>{{ question.description|linebreaks }}</p>
+    <p class="text-muted">Asked by {{ question.author.username }} on {{ question.created_at }}</p>
+
+    <hr>
+    <h4>Answers</h4>
+    <h4>Answers</h4>
+    {% for answer in answers %}
+        <div class="mb-3 p-3 border rounded bg-light">
+            <p>{{ answer.content|linebreaks }}</p>
+            <p class="text-muted">Answered by {{ answer.author.username }} on {{ answer.created_at }}</p>
+            <form method="POST" action="{% url 'like_answer' answer.id %}">
+                {% csrf_token %}
+                {% if answer.id in liked_answer_ids %}
+                    <!-- Already liked -->
+                    <button type="submit" class="bg-transparent border-0 p-0 like-button text-success">
+                        <span class="me-2">👍</span>  {{ answer.likes.count }}
+                    </button>
+                {% else %}
+                    <!-- Not yet liked -->
+                    <button type="submit" class="bg-transparent border-0 p-0 like-button text-primary">
+                        <span class="me-1">👍</span>  {{ answer.likes.count }}
+                    </button>
+                {% endif %}
+            </form>
+            
+        </div>
+    {% empty %}
+        <p>No answers yet. Be the first to answer!</p>
+    {% endfor %}
+    
+
+
+    {% if user.is_authenticated %}
+    <hr>
+    <h4>Write Your Answer</h4>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Submit Answer</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

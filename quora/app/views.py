@@ -1,7 +1,10 @@
-from django.shortcuts import render, redirect
-from .models import Question
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import *
 from .forms import QuestionForm
 from django.contrib.auth.decorators import login_required
+from .forms import AnswerForm
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 @login_required
 def home(request):
@@ -23,8 +26,14 @@ def recent_questions(request):
     return render(request, 'recent_questions.html', {'questions': questions})
 
 @login_required
-def answer_question(request, question_id):
+def question_detail(request, question_id):
     question = get_object_or_404(Question, id=question_id)
+    answers = question.answers.all().order_by('-created_at')
+    form = AnswerForm()
+
+    # Get all answer IDs liked by current user
+    liked_answer_ids = Like.objects.filter(user=request.user, answer__in=answers).values_list('answer_id', flat=True)
+
     if request.method == 'POST':
         form = AnswerForm(request.POST)
         if form.is_valid():
@@ -33,6 +42,22 @@ def answer_question(request, question_id):
             answer.author = request.user
             answer.save()
             return redirect('question_detail', question_id=question.id)
-    else:
-        form = AnswerForm()
-    return render(request, 'answer_question.html', {'question': question, 'form': form})
+
+    return render(request, 'question_detail.html', {
+        'question': question,
+        'answers': answers,
+        'form': form,
+        'liked_answer_ids': liked_answer_ids
+    })
+
+
+@login_required
+def like_answer(request, answer_id):
+    answer = Answer.objects.get(id=answer_id)
+    like, created = Like.objects.get_or_create(user=request.user, answer=answer)
+
+    if not created:
+        # User already liked, so unlike
+        like.delete()
+
+    return HttpResponseRedirect(reverse('question_detail', args=[answer.question.id]))

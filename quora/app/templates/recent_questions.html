@@ -6,7 +6,9 @@
     {% for question in questions %}
         <div class="card mb-3">
             <div class="card-body">
-                <h5 class="card-title">{{ question.title }}</h5>
+                <h5 class="card-title">
+                    <a href="{% url 'question_detail' question.id %}">{{ question.title }}</a>
+                </h5>
                 <p class="card-text">{{ question.description|linebreaks }}</p>
                 <p class="text-muted">Asked by {{ question.author.username }} on {{ question.created_at }}</p>
             </div>
